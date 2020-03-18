@@ -43,7 +43,20 @@ function col = extractColCSC(C, j)
   end
 end
 
-function row = extractRowCSC(M, i)
+function row = extractRowCSC(C, i)
+  % this works with the assumption of square matrix
+  n = length(C.J) -1;
+  row = zeros(1, n);
+
+  % TODO: This implementation is not optimal
+  idx = 1;
+  for k = 1:length(C.A)
+    if C.I(k) == i
+      row(idx) = C.A(k);
+    end
+
+    idx = idx + 1;
+  end
 end
 
 function b = mulCSC(A, B)
