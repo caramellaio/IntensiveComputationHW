@@ -32,6 +32,16 @@ function col = extractColEllLt(C, j)
 end
 
 function row = extractRowEllLt(C, i)
+  n = size(C.COEF, 1)
+  row = zeros(1, n);
+
+  % get non zero elements of row i
+  nnz_i = find(C.COEF(i,:))
+  % get non zero elements indexes of row i
+  nnz_col_i = C.JCOEF(i,1: length(nnz_i));
+  row(nnz_col_i) = C.COEF(i, nnz_i);
+
+  % store row i elems in correct col position
 end
 
 function C = mulEllLt(A, B)
@@ -41,12 +51,6 @@ function M = toFullEllLt(C)
   n = size(C.COEF, 1)
   M = zeros(n);
   for i = 1:n
-    % get non zero elements of row i
-    nnz_i = find(C.COEF(i,:))
-    % get non zero elements indexes of row i
-    nnz_col_i = C.JCOEF(i,1: length(nnz_i));
-
-    % store row i elems in correct col position
-    M(i, nnz_col_i) = C.COEF(i, nnz_i);
+    M(i,:) = extractRowEllLt(C, i);
   end
 end
