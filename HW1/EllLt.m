@@ -1,9 +1,9 @@
 function funs = EllLt
   funs.toCompact=@toCompactEllLt;
-  %funs.extractCol=@extractColEllLt;
-  %funs.extractRow=@extractRowEllLt;
+  funs.extractCol=@extractColEllLt;
+  funs.extractRow=@extractRowEllLt;
   %funs.mul=@mulEllLt;
-  %funs.toFull=@toFullEllLt;
+  funs.toFull=@toFullEllLt;
 end
 
 function c = toCompactEllLt(M, nz_m)
@@ -26,4 +26,27 @@ function c = toCompactEllLt(M, nz_m)
     JCOEF(i, 1:length(idxs)) = J(idxs);
   end
   c = struct('COEF', COEF, 'JCOEF', JCOEF);
+end
+
+function col = extractColEllLt(C, j)
+end
+
+function row = extractRowEllLt(C, i)
+end
+
+function C = mulEllLt(A, B)
+end
+
+function M = toFullEllLt(C)
+  n = size(C.COEF, 1)
+  M = zeros(n);
+  for i = 1:n
+    % get non zero elements of row i
+    nnz_i = find(C.COEF(i,:))
+    % get non zero elements indexes of row i
+    nnz_col_i = C.JCOEF(i,1: length(nnz_i));
+
+    % store row i elems in correct col position
+    M(i, nnz_col_i) = C.COEF(i, nnz_i);
+  end
 end
