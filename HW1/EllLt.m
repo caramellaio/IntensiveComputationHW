@@ -29,6 +29,14 @@ function c = toCompactEllLt(M, nz_m)
 end
 
 function col = extractColEllLt(C, j)
+  n = size(C.COEF, 1);
+  col = zeros(n, 1);
+
+  c_vals = C.COEF(find(C.JCOEF == j));
+  % TODO: find a way to compute value just once
+  [c_rows, foo, bar] = find(C.JCOEF == j);
+
+  col(c_rows) = c_vals;
 end
 
 function row = extractRowEllLt(C, i)
