@@ -30,7 +30,23 @@ function c = toCompactMSR(M)
 end
 
 function col = extractColMSR(C, j)
-  col = zeros()
+  n = find(C.B == length(C.V)+1) - 1;
+  col = zeros(n,1);
+
+  col(j) = C.V(j);
+
+  nnz_col_V = n + 1 + find(C.B(n + 2:length(C.B)) == j);
+  col_vals = C.V(nnz_col_V);
+
+  last_row = 1;
+
+  for i = 1:length(nnz_col_V)
+    lt_array = find(C.B(last_row:n) <= nnz_col_V(i));
+    % get the latest row which is <= to col index
+    last_row = lt_array(length(lt_array));
+    assert(length(lt_array) > 0);
+    col(last_row) = col_vals(i);
+  end
 end
 
 function row = extractRowMSR(C, i)
@@ -49,6 +65,8 @@ function row = extractRowMSR(C, i)
 end
 
 function c = mulMSR(A, B)
+  
+  c = struct('B', C_B, 'V', C_V);
 end
 
 function M = toFullMSR(c)
