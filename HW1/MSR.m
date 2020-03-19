@@ -69,5 +69,12 @@ function c = mulMSR(A, B)
   c = struct('B', C_B, 'V', C_V);
 end
 
-function M = toFullMSR(c)
+function M = toFullMSR(C)
+  n = find(C.B == length(C.V)+1) -1;
+
+  M = zeros(n);
+
+  for i = 1:n
+    M(i,:) = extractRowMSR(C, i);
+  end
 end
