@@ -31,21 +31,41 @@ end
 
 function col = extractColMSR(C, j)
   n = find(C.B == length(C.V)+1) - 1;
-  col = zeros(n,1);
 
-  col(j) = C.V(j);
+  if j <= n
+    col = zeros(n,1);
+
+    [r_idx, col_vals] = extractColMSRCompact(C, n, j);
+
+    col(r_idx) = col_vals;
+  else
+    col = NaN;
+  end
+end
+
+% PRIVATE FUNCTION
+function [r_idx, col_val] = extractColMSRCompact(C, n, j)
+  assert(j <= n);
 
   nnz_col_V = n + 1 + find(C.B(n + 2:length(C.B)) == j);
-  col_vals = C.V(nnz_col_V);
+  col_range = vertcat(nnz_col_V, j);
+
+  col_val = C.V(col_range);
+
+  r_idx = zeros(length(col_val), 1, 'int32');
+
+  % diag entry
+  r_idx(length(col_val)) = j;
 
   last_row = 1;
 
+  % populate the index vector
   for i = 1:length(nnz_col_V)
     lt_array = find(C.B(last_row:n) <= nnz_col_V(i));
     % get the latest row which is <= to col index
     last_row = lt_array(length(lt_array));
     assert(length(lt_array) > 0);
-    col(last_row) = col_vals(i);
+    r_idx(i) = last_row;
   end
 end
 
@@ -54,18 +74,36 @@ function row = extractRowMSR(C, i)
   n = find(C.B == length(C.V)+1) - 1;
   if i <= n
     row = zeros(1, n);
-
-    % get diag element
-    row(i) = C.V(i);
-    row_range = C.B(i) : C.B(i+1)-1;
-    row(C.B(row_range)) = C.V(row_range);
+    [pos, vals] = extractRowMSRCompact(C, n, i)
+    row(pos) = vals;
   else
     row = NaN;
   end
 end
 
+% PRIVATE FUNCTION
+function [c_idx, row_val] = extractRowMSRCompact(C, n, i)
+  % extr row from diag and C.B
+  assert(i <= n);
+  row_range = vertcat(C.B(i) : C.B(i+1)-1, i)
+  row_val = C.V(row_range);
+
+  % get col id using C.B + append diag index
+  c_idx = vertcat(C.B(row_range(1:length(row_range)-1)), i);
+end
+
+
 function c = mulMSR(A, B)
-  
+  n = find(A.B == length(A.V)+1) - 1;
+  n2 = find(B.B == length(B.V)+1) - 1;
+
+  assert(n == n2);
+
+  for i = 1:n
+    for j = 1:n
+    end
+  end
+  %a_rows_idx = 
   c = struct('B', C_B, 'V', C_V);
 end
 
