@@ -14,7 +14,7 @@ function c = toCompactMSR(M)
   % remove the diagonal
   M(logical(eye(size(M)))) = 0;
 
-  [J, I_tmp, A] = find(M')
+  [J, I_tmp, A] = find(M');
 
   V = zeros(n + 1 + length(A), 1);
   B = zeros(n + 1 + length(A), 1, 'int32');
@@ -30,7 +30,7 @@ function c = toCompactMSR(M)
 end
 
 function col = extractColMSR(C, j)
-  n = find(C.B == length(C.V)+1) - 1;
+  n = getN(C);
 
   if j <= n
     col = zeros(n,1);
@@ -71,10 +71,10 @@ end
 
 function row = extractRowMSR(C, i)
   % at the 'n + 1'th position the end of the array + 1 is stored
-  n = find(C.B == length(C.V)+1) - 1;
+  n = getN(C);
   if i <= n
     row = zeros(1, n);
-    [pos, vals] = extractRowMSRCompact(C, n, i)
+    [pos, vals] = extractRowMSRCompact(C, n, i);
     row(pos) = vals;
   else
     row = NaN;
@@ -85,7 +85,7 @@ end
 function [c_idx, row_val] = extractRowMSRCompact(C, n, i)
   % extr row from diag and C.B
   assert(i <= n);
-  row_range = vertcat(C.B(i) : C.B(i+1)-1, i)
+  row_range = horzcat(C.B(i) : C.B(i+1)-1, i);
   row_val = C.V(row_range);
 
   % get col id using C.B + append diag index
@@ -94,25 +94,76 @@ end
 
 
 function c = mulMSR(A, B)
-  n = find(A.B == length(A.V)+1) - 1;
+  n = getN(C);
   n2 = find(B.B == length(B.V)+1) - 1;
 
   assert(n == n2);
 
+  [a_idxs, row_vals] = arrayfun(@(i) extractRowMSRCompact(A, n, i), 1:n, 'UniformOutput', false);
+  [b_idxs, col_vals] = arrayfun(@(j) extractColMSRCompact(B, n, j), 1:n, 'UniformOutput', false);
+
+  next = n + 2;
+
+  % min size of the fields
+  C_B = zeros(n + 1, 1, 'int32');
+  C_V = zeros(n + 1, 1);
+
   for i = 1:n
+    a_row_col = a_idxs{i};
+    a_row_val = row_vals{i};
     for j = 1:n
+      b_col_row = b_idxs{j};
+      b_col_val = col_vals{j};
+
+      [elems, b_col_idxs, a_row_idxs] = intersect(b_col_row, a_row_col);
+
+      if length(elems) > 0
+        r = dot(b_col_val(b_col_idxs), a_row_val(a_row_idxs));
+      else
+        r = 0;
+      end
+
+      if i == j
+        C_V(i) = r;
+      elseif 0 ~= r
+        % case new row
+        if C_B(i) == 0%j == 1
+          % store new row information
+          C_B(i) = next;
+        end
+        C_V(next) = r;
+        C_B(next) = j;
+        next = next + 1;
+      end
+    end
+
+    if C_B(i) == 0
+      % case of empty row
+      C_B(i) = next;
     end
   end
-  %a_rows_idx = 
+
+  % set END delimiter for rows
+  C_B(n+1) = length(C_V) + 1;
+  C_V(n+1) = NaN;
+
+  %C_V = reshape(C_V, length(C_V), 1);
+  %C_B = int32(reshape(C_B, length(C_B), 1));
   c = struct('B', C_B, 'V', C_V);
 end
 
 function M = toFullMSR(C)
-  n = find(C.B == length(C.V)+1) -1;
+  n = getN(C);
 
   M = zeros(n);
 
   for i = 1:n
     M(i,:) = extractRowMSR(C, i);
   end
+end
+
+function n = getN(C)
+  n_arr = find(C.B == length(C.V)+1) -1;
+
+  n = n_arr(end)
 end
