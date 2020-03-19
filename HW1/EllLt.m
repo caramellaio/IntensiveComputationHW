@@ -2,7 +2,7 @@ function funs = EllLt
   funs.toCompact=@toCompactEllLt;
   funs.extractCol=@extractColEllLt;
   funs.extractRow=@extractRowEllLt;
-  %funs.mul=@mulEllLt;
+  funs.mul=@mulEllLt;
   funs.toFull=@toFullEllLt;
 end
 
@@ -53,6 +53,35 @@ function row = extractRowEllLt(C, i)
 end
 
 function C = mulEllLt(A, B)
+  n = size(A.COEF, 1);
+  nz_m = size(A.COEF, 2);
+
+  C_COEF = zeros(n, nz_m);
+  C_JCOEF = zeros(n, nz_m, 'int32');
+
+  for i = 1:n
+    nnz_i = nnz(A.COEF(i,:));
+    a_row_cols = A.JCOEF(i, 1:nnz_i);
+    a_row_vals = A.COEF(i, 1:nnz_i);
+
+    % actual index inside ith row
+    idx = 1;
+    for j = 1:n
+      b_col_vals = B.COEF(find(B.JCOEF == j));
+      % TODO: find a way to compute value just once
+      [b_col_rows, foo, bar] = find(B.JCOEF == j);
+
+      [elems, b_idxs, a_idxs] = intersect(b_col_rows, a_row_cols);
+      if length(elems) > 0
+        C_COEF(i, idx) = dot(a_row_vals(a_idxs), b_col_vals(b_idxs));
+        C_JCOEF(i, idx) = j;
+
+        idx = idx + 1;
+      end
+
+    end
+  end
+  C = struct('COEF', C_COEF, 'JCOEF', C_JCOEF);
 end
 
 function M = toFullEllLt(C)
