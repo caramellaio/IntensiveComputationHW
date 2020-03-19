@@ -147,8 +147,6 @@ function c = mulMSR(A, B)
   C_B(n+1) = length(C_V) + 1;
   C_V(n+1) = NaN;
 
-  %C_V = reshape(C_V, length(C_V), 1);
-  %C_B = int32(reshape(C_B, length(C_B), 1));
   c = struct('B', C_B, 'V', C_V);
 end
 
