@@ -6,13 +6,14 @@ function funs = EllLt
   funs.toFull=@toFullEllLt;
 end
 
-function c = toCompactEllLt(M, nz_m)
+function c = toCompactEllLt(M)
   M_T = M';
 
   n = size(M,1);
+  nz_m = int16(n / 5);
 
   % we swap I and J since M_T is transposed
-  [J, I, A] = find(M_T)
+  [J, I, A] = find(M_T);
 
   % find uses double precision even if it is not required
   J = int32(J);
@@ -21,7 +22,7 @@ function c = toCompactEllLt(M, nz_m)
   JCOEF = zeros(n, nz_m, 'int32');
   for i = 1:n
     % get all rows indexes
-    idxs = find(I == i)
+    idxs = find(I == i);
     COEF(i, 1:length(idxs)) = A(idxs);
     JCOEF(i, 1:length(idxs)) = J(idxs);
   end
@@ -40,11 +41,11 @@ function col = extractColEllLt(C, j)
 end
 
 function row = extractRowEllLt(C, i)
-  n = size(C.COEF, 1)
+  n = size(C.COEF, 1);
   row = zeros(1, n);
 
   % get non zero elements of row i
-  nnz_i = find(C.COEF(i,:))
+  nnz_i = find(C.COEF(i,:));
   % get non zero elements indexes of row i
   nnz_col_i = C.JCOEF(i,1: length(nnz_i));
   row(nnz_col_i) = C.COEF(i, nnz_i);
@@ -85,7 +86,7 @@ function C = mulEllLt(A, B)
 end
 
 function M = toFullEllLt(C)
-  n = size(C.COEF, 1)
+  n = size(C.COEF, 1);
   M = zeros(n);
   for i = 1:n
     M(i,:) = extractRowEllLt(C, i);
