@@ -61,7 +61,7 @@ function [r_idx, col_val] = extractColMSRCompact(C, n, j)
 
   % populate the index vector
   for i = 1:length(nnz_col_V)
-    lt_array = find(C.B(last_row:n) <= nnz_col_V(i));
+    lt_array = last_row + find(C.B(last_row:n) <= nnz_col_V(i)) - 1;
     % get the latest row which is <= to col index
     last_row = lt_array(length(lt_array));
     assert(length(lt_array) > 0);
@@ -94,8 +94,8 @@ end
 
 
 function c = mulMSR(A, B)
-  n = getN(C);
-  n2 = find(B.B == length(B.V)+1) - 1;
+  n = getN(A);
+  n2 = getN(B);
 
   assert(n == n2);
 
@@ -163,5 +163,5 @@ end
 function n = getN(C)
   n_arr = find(C.B == length(C.V)+1) -1;
 
-  n = n_arr(end)
+  n = n_arr(end);
 end
