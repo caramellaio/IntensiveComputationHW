@@ -1,7 +1,7 @@
 
-funcs = [MSR(), EllLt(), fullFuncs()];
+funcs = [MSR(), EllLt(), CSC(), fullFuncs()];
 genM = MatrixGen().genRandomMatrix;
-labels = ["MSR", "EllLt", "full"];
+labels = ["MSR", "EllLt", "CSC", "full"];
 ExpEvals(funcs, genM, labels);
 
 function funs = fullFuncs
@@ -16,7 +16,7 @@ end
 function ExpEvals(funcs, genMFunc, method_labels)
 
   % we perform 5 iterations and then we get the avg.
-  iters = 25;
+  iters = 10;
   n_configs = 1:8;
 
   n_configs = n_configs * 25;
