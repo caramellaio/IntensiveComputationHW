@@ -29,8 +29,6 @@ function ExpEvals(funcs, genMFunc, method_labels)
   time = zeros(length(funcs), length(n_configs));
   for k = 1:length(n_configs)
     n = n_configs(k)
-    mul_t = 0;
-    space_i = 0;
 
     M1 = genMFunc(n, 0.8, 100);
     M2 = genMFunc(n, 0.8, 100);
@@ -38,7 +36,8 @@ function ExpEvals(funcs, genMFunc, method_labels)
     for a = 1:length(funcs)
       method_labels(a)
       func = funcs(a);
-
+      mul_t = 0;
+      space_i = 0;
       for i = 1:iters
         A = func.toCompact(M1);
         B = func.toCompact(M2);
