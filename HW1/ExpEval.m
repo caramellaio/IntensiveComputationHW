@@ -1,7 +1,7 @@
 
-funcs = [MSR(), EllLt(), CSC(), fullFuncs()];
+funcs = [MSR(), EllLt(), CSC(), CSR(), fullFuncs()];
 genM = MatrixGen().genRandomMatrix;
-labels = ["MSR", "EllLt", "CSC", "full"];
+labels = ["MSR", "EllLt", "CSC", "CSR", "full"];
 ExpEvals(funcs, genM, labels);
 
 function funs = fullFuncs
@@ -11,6 +11,8 @@ function funs = fullFuncs
   funs.extractRow=0;
   funs.mul=@fullMul;
   funs.toFull=@id;
+  funs.extrColComp=0;
+  funs.extrRowComp=0;
 end
 
 function ExpEvals(funcs, genMFunc, method_labels)

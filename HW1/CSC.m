@@ -4,6 +4,8 @@ function funs = CSC
   funs.extractRow=@extractRowCSC;
   funs.mul=@mulCSC;
   funs.toFull=@toFullCSC;
+  funs.extrColComp=@extractColCSCCompact;
+  funs.extrRowComp=@extractRowCSCCompact;
 end
 
 function c = toCompactCSC(M)

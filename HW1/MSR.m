@@ -4,6 +4,8 @@ function funs = MSR
   funs.extractRow=@extractRowMSR;
   funs.mul=@mulMSR;
   funs.toFull=@toFullMSR;
+  funs.extrRowComp=@extractRowMSRCompact;
+  funs.extrColComp=@extractColMSRCompact;
 end
 
 function c = toCompactMSR(M)

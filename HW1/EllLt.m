@@ -4,6 +4,12 @@ function funs = EllLt
   funs.extractRow=@extractRowEllLt;
   funs.mul=@mulEllLt;
   funs.toFull=@toFullEllLt;
+  funs.extrColComp=@foo;
+  funs.extrRowComp=@foo;
+end
+
+function a = foo()
+  a = NaN;
 end
 
 function c = toCompactEllLt(M)
