@@ -39,24 +39,31 @@ function col = extractColEllLt(C, j)
   n = size(C.COEF, 1);
   col = zeros(n, 1);
 
-  c_vals = C.COEF(find(C.JCOEF == j));
-  % TODO: find a way to compute value just once
-  [c_rows, foo, bar] = find(C.JCOEF == j);
-
+  [c_rows, c_vals] = extractColEllLtCompact(C, j);
   col(c_rows) = c_vals;
+end
+
+function [r_idx, col_val] = extractColEllLtCompact(C, j)
+  col_val = C.COEF(find(C.JCOEF == j));
+  [r_idx, foo, bar] = find(C.JCOEF == j);
 end
 
 function row = extractRowEllLt(C, i)
   n = size(C.COEF, 1);
   row = zeros(1, n);
 
+  [col_idx, row_val] = extractRowEllLtCompact(C, i);
+  row(col_idx) = row_val;
+
+  % store row i elems in correct col position
+end
+
+function [col_idx, row_val] = extractRowEllLtCompact(C, i)
   % get non zero elements of row i
   nnz_i = find(C.COEF(i,:));
   % get non zero elements indexes of row i
-  nnz_col_i = C.JCOEF(i,1: length(nnz_i));
-  row(nnz_col_i) = C.COEF(i, nnz_i);
-
-  % store row i elems in correct col position
+  col_idx = C.JCOEF(i,1: length(nnz_i));
+  row_val = C.COEF(i, nnz_i);
 end
 
 function C = mulEllLt(A, B)
@@ -66,21 +73,22 @@ function C = mulEllLt(A, B)
   C_COEF = zeros(n, nz_m);
   C_JCOEF = zeros(n, nz_m, 'int32');
 
+  [a_idxs, row_vals] = arrayfun(@(i) extractRowEllLtCompact(A, i), 1:n, 'UniformOutput', false);
+  [b_idxs, col_vals] = arrayfun(@(j) extractColEllLtCompact(B, j), 1:n, 'UniformOutput', false);
+
   for i = 1:n
-    nnz_i = nnz(A.COEF(i,:));
-    a_row_cols = A.JCOEF(i, 1:nnz_i);
-    a_row_vals = A.COEF(i, 1:nnz_i);
+    a_row_cols = a_idxs{i};
+    a_row_vals = row_vals{i};
 
     % actual index inside ith row
     idx = 1;
     for j = 1:n
-      b_col_vals = B.COEF(find(B.JCOEF == j));
-      % TODO: find a way to compute value just once
-      [b_col_rows, foo, bar] = find(B.JCOEF == j);
+      b_col_rows = b_idxs{j};
+      b_col_vals = col_vals{j};
 
-      [elems, b_idxs, a_idxs] = intersect(b_col_rows, a_row_cols);
+      [elems, b_idxs_int, a_idxs_int] = intersect(b_col_rows, a_row_cols);
       if length(elems) > 0
-        C_COEF(i, idx) = dot(a_row_vals(a_idxs), b_col_vals(b_idxs));
+        C_COEF(i, idx) = dot(a_row_vals(a_idxs_int), b_col_vals(b_idxs_int));
         C_JCOEF(i, idx) = j;
 
         idx = idx + 1;
