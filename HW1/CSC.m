@@ -40,7 +40,6 @@ function col = extractColCSC(C, j)
   col(i_idxs) = col_val;
 end
 
-% PRIVATE FUNCTION
 function [r_idx, col_val] = extractColCSCCompact(C, j)
   range = C.J(j):C.J(j+1) -1;
   r_idx = C.I(range);
@@ -57,7 +56,6 @@ function row = extractRowCSC(C, i)
   row(col_idx) = row_val;
 end
 
-% PRIVATE FUNCTION
 function [col_idx, row_val] = extractRowCSCCompact(C, i)
   % TODO: This implementation is not optimal
   idx = 1;
