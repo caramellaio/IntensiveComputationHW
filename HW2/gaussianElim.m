@@ -1,4 +1,4 @@
-function x = gaussianElim(A, b, show_spy, compute_graph)
+function x = gaussianElim(A, b, applyPivoting, show_spy, compute_graph)
   n = size(A, 2);
 
   spy(A);
@@ -8,34 +8,23 @@ function x = gaussianElim(A, b, show_spy, compute_graph)
 
   count = prod(size(A));
 
+  % this vector keeps track of the swapping operations on b
+  b_swap = zeros(1, n);
+
   for k = 1:n
+    A = applyPivoting(A, b, k, b_swap);
+
+    % if the value is zero even with pivoting skip
     if A(k, k) == 0
-      % find the next non zero element of the kth column
-      nnz_pos = find(A(k+1:end,k)) + k
+      continue
+    end
+    if compute_graph
+      sp_vec(step) = (count - nnz(A)) / count;
+    end
 
-      fprintf("found null diagonal element at row %d\n", k);
-      if length(nnz_pos) == 0
-        % this matrix cannot be triangular
-        continue
-      else
-        % apply zero pivoting
-        temp = A(nnz_pos(1), :);
-        temp_b = b(nnz_pos(1));
-        b(nnz_pos(1)) = b(k);
-        b(k) = temp_b;
-        A(nnz_pos(1), :) = A(k,:);
-        A(k,:) = temp;
-        b_swap(k) = nnz_pos(1);
-        fprintf("row %d swapped with row %d\n", k, nnz_pos(1));
-        if show_spy
-          pause(5);
-          spy(A);
-        end
-
-        if compute_graph
-          sp_vec(step) = (count - nnz(A)) / count;
-        end
-      end
+    if show_spy
+      pause(0.1);
+      spy(A);
     end
     for i = k+1:n
 
@@ -48,7 +37,7 @@ function x = gaussianElim(A, b, show_spy, compute_graph)
       b(i) = b(i) - mul_i_k * b(k);
       if show_spy
         pause(1.3);
-        spy(A)
+        spy(A);
       end
 
       if compute_graph
@@ -58,7 +47,6 @@ function x = gaussianElim(A, b, show_spy, compute_graph)
     end
   end
 
-  pause(.9);
   if compute_graph
     plot(1:length(sp_vec), sp_vec, 'DisplayName', 'Matrix Sparsity');
     xlabel("Iteration step");
@@ -67,7 +55,6 @@ function x = gaussianElim(A, b, show_spy, compute_graph)
   end
   x = backwardSub(A, b);
 
-  A
   % adjust result order
   for i = 1:length(b_swap)
     if 0 ~= b_swap(i)
