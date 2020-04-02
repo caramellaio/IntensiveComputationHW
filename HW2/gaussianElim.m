@@ -9,12 +9,12 @@ function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph)
   count = prod(size(A));
 
   % this vector keeps track of the swapping operations on b
-  b_swap = zeros(1, n);
+  x_swap = zeros(1, n);
 
   for k = 1:n
-    to_swap = getPivoting(A, b, k, b_swap);
+    to_swap = getPivoting(A, b, k);
 
-    swap(k, to_swap);
+    swap([k, k], to_swap);
     % if the value is zero even with pivoting skip
     if A(k, k) == 0
       continue
@@ -52,27 +52,47 @@ function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph)
     ylabel("Sparsity");
     legend;
   end
-  x = backwardSub(A, b);
-
-  %{ adjust result order
-  for i = 1:length(b_swap)
-    if 0 ~= b_swap(i)
-      temp = x(i);
-      x(i) = x(b_swap(i));
-      x(b_swap(i)) = temp;
-    end
-  end%}
+  A
+  b
+  x = backwardSub(A, b)
+  adjust_x();
 
   function swap(k0, k1)
-    assert(k1 >= k0);
-    if k0 ~= k1
-      temp = A(k0,:);
-      A(k0,:) = A(k1,:);
-      A(k1,:) = temp;
+    assert(sum(k1 >= k0) == 2);
+    if ~isequal(k0, k1)
+      % swap rows
+      fprintf("Swapping %d %d with %d %d", k0(1), k0(2), k1(1), k1(2));
+      if k0(1) ~= k1(1)
+        temp = A(k0(1),:);
+        A(k0(1),:) = A(k1(1),:);
+        A(k1(1),:) = temp;
 
-      temp = b(k0);
-      b(k0) = b(k1);
-      b(k1) = temp;
+        temp = b(k0(1));
+        b(k0(1)) = b(k1(1));
+        b(k1(1)) = temp;
+      end
+
+      % swap column
+      if k0(2) ~= k1(2)
+        temp = A(:,k0(2));
+        A(:, k0(2)) = A(:, k1(2));
+        A(:, k1(2)) = temp;
+
+        % we need to swap the rows in the end
+        x_swap(k0(2)) = k1(2);
+      end
+    end
+  end
+
+  function adjust_x
+    x_swap
+    % adjust result order
+    for i = 1:length(x_swap)
+      if 0 ~= x_swap(i)
+        temp = x(i);
+        x(i) = x(x_swap(i));
+        x(x_swap(i)) = temp;
+      end
     end
   end
 end
