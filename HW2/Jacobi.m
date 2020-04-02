@@ -2,7 +2,6 @@ function x = Jabobi(A, b, epsilon)
   addpath('../HW1');
   err = Inf;
   % usefull functions
-  extr = MSR().extrRowComp;
   toFull = MSR().toFull;
   zeroPiv = Pivoting().getZeroPivoting;
 
@@ -19,17 +18,12 @@ function x = Jabobi(A, b, epsilon)
   while err > epsilon
     step = step + 1;
     for i = 1:n
-      row_vals{i}
-      x(col_idxs{i})
-      dot(row_vals{i}, x(col_idxs{i}))
       new_x(i) = b(i) / A.V(i) - dot(row_vals{i} / A.V(i), x(col_idxs{i}));
     end
 
-    old_err = err
-    err = norm(exact - new_x, 1)
-    exact
-    new_x
-    %assert(err <= old_err);
+    old_err = err;
+    err = norm(exact - new_x, 1);
+    assert(err <= old_err);
     x = new_x;
   end
 

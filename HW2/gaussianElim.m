@@ -24,7 +24,7 @@ function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph)
     end
 
     if show_spy
-      pause(0.1);
+      %pause(0.005);
       spy(A);
     end
     for i = k+1:n
@@ -35,7 +35,7 @@ function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph)
 
       b(i) = b(i) - mul_i_k * b(k);
       if show_spy
-        pause(0.1);
+        pause(0.0005);
         spy(A);
       end
 
