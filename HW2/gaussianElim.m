@@ -1,4 +1,4 @@
-function x = gaussianElim(A, b, applyPivoting, show_spy, compute_graph)
+function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph)
   n = size(A, 2);
 
   spy(A);
@@ -12,8 +12,9 @@ function x = gaussianElim(A, b, applyPivoting, show_spy, compute_graph)
   b_swap = zeros(1, n);
 
   for k = 1:n
-    [A, b] = applyPivoting(A, b, k, b_swap);
+    to_swap = getPivoting(A, b, k, b_swap);
 
+    swap(k, to_swap);
     % if the value is zero even with pivoting skip
     if A(k, k) == 0
       continue
@@ -30,9 +31,7 @@ function x = gaussianElim(A, b, applyPivoting, show_spy, compute_graph)
 
       mul_i_k = A(i, k) / A(k, k);
 
-      for j = k:n
-        A(i, j) = A(i, j) - (mul_i_k * A(k, j));
-      end
+      A(i, k:n) = A(i, k:n) - (mul_i_k * A(k, k:n));
 
       b(i) = b(i) - mul_i_k * b(k);
       if show_spy
@@ -63,6 +62,19 @@ function x = gaussianElim(A, b, applyPivoting, show_spy, compute_graph)
       x(b_swap(i)) = temp;
     end
   end%}
+
+  function swap(k0, k1)
+    assert(k1 >= k0);
+    if k0 ~= k1
+      temp = A(k0,:);
+      A(k0,:) = A(k1,:);
+      A(k1,:) = temp;
+
+      temp = b(k0);
+      b(k0) = b(k1);
+      b(k1) = temp;
+    end
+  end
 end
 
 function x = backwardSub(A, b)
