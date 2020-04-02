@@ -2,7 +2,7 @@ function funcs = Pivoting
   funcs.applyZeroPivoting = @zeroPivoting;
 end
 
-function A_prime = zeroPivoting(A, b, k, b_swap)
+function [A_prime, b_prime] = zeroPivoting(A, b, k, b_swap)
   if A(k, k) == 0
     % find the next non zero element of the kth column
     nnz_pos = find(A(k+1:end,k)) + k
@@ -26,4 +26,5 @@ function A_prime = zeroPivoting(A, b, k, b_swap)
   end
 
   A_prime = A;
+  b_prime = b;
 end

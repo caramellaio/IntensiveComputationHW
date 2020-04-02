@@ -12,7 +12,7 @@ function x = gaussianElim(A, b, applyPivoting, show_spy, compute_graph)
   b_swap = zeros(1, n);
 
   for k = 1:n
-    A = applyPivoting(A, b, k, b_swap);
+    [A, b] = applyPivoting(A, b, k, b_swap);
 
     % if the value is zero even with pivoting skip
     if A(k, k) == 0
@@ -36,7 +36,7 @@ function x = gaussianElim(A, b, applyPivoting, show_spy, compute_graph)
 
       b(i) = b(i) - mul_i_k * b(k);
       if show_spy
-        pause(1.3);
+        pause(0.1);
         spy(A);
       end
 
@@ -55,14 +55,14 @@ function x = gaussianElim(A, b, applyPivoting, show_spy, compute_graph)
   end
   x = backwardSub(A, b);
 
-  % adjust result order
+  %{ adjust result order
   for i = 1:length(b_swap)
     if 0 ~= b_swap(i)
       temp = x(i);
       x(i) = x(b_swap(i));
       x(b_swap(i)) = temp;
     end
-  end
+  end%}
 end
 
 function x = backwardSub(A, b)
