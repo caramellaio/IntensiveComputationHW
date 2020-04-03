@@ -1,4 +1,4 @@
-function x = Jabobi(A, b, epsilon)
+function x = Jabobi(A, b, epsilon, useExactCriteria)
   addpath('../HW1');
   err = Inf;
   % usefull functions
@@ -9,7 +9,11 @@ function x = Jabobi(A, b, epsilon)
   x = zeros(n, 1);
   new_x = zeros(n, 1);
 
-  exact = gaussianElim(toFull(A), b, zeroPiv, false, false)
+  if useExactCriteria
+    exact = gaussianElim(toFull(A), b, zeroPiv, false, false)
+  else
+    exact = [];
+  end
 
   [col_idxs, row_vals] = arrayfun(@(i) genCompRows(A, n, i), 1:n, 'UniformOutput', false);
   % diag values are stored as last element
@@ -22,7 +26,11 @@ function x = Jabobi(A, b, epsilon)
     end
 
     old_err = err;
-    err = norm(exact - new_x, 1);
+    if useExactCriteria
+      err = norm(exact - new_x, 1);
+    else
+      err = norm(new_x - x);
+    end
     assert(err <= old_err);
     x = new_x;
   end
