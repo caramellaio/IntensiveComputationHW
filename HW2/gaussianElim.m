@@ -1,7 +1,9 @@
 function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph)
   n = size(A, 2);
 
-  spy(A);
+  if show_spy
+    spy(A);
+  end
 
   step = 1;
   sp_vector = [];
