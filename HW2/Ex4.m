@@ -41,13 +41,13 @@ for i = 1:DEF_STEPS
 
     % time for par jacobi
     t = cputime;
-    x = Jacobi(c, b, DEF_EPSILON, false, true);
+    Jacobi(c, b, DEF_EPSILON, false, true);
     y_pj = cputime - t;
     Y_parallel(i) = Y_parallel(i) + y_pj;
 
     % time for seq jacobi
     t = cputime;
-    x_prime = Jacobi(c, b, DEF_EPSILON, false, false);
+    Jacobi(c, b, DEF_EPSILON, false, false);
     y_sj = cputime - t;
     Y_sequential(i) = Y_sequential(i) + y_sj;
 
