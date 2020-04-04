@@ -1,4 +1,4 @@
-function x = IterativeMethods(A, b, epsilon, useExactCriteria, jacobi, par)
+function [x, step] = IterativeMethods(A, b, epsilon, useExactCriteria, jacobi, par)
   addpath('../HW1');
   err = Inf;
   % usefull functions
@@ -10,7 +10,7 @@ function x = IterativeMethods(A, b, epsilon, useExactCriteria, jacobi, par)
   new_x = zeros(n, 1);
 
   if useExactCriteria
-    exact = gaussianElim(toFull(A), b, zeroPiv, false, false)
+    exact = gaussianElim(toFull(A), b, zeroPiv, false, false);
   else
     exact = [];
   end

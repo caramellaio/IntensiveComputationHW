@@ -54,9 +54,7 @@ function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph)
     ylabel("Sparsity");
     legend;
   end
-  A
-  b
-  x = backwardSub(A, b)
+  x = backwardSub(A, b);
   adjust_x();
 
   function swap(k0, k1)
@@ -87,7 +85,6 @@ function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph)
   end
 
   function adjust_x
-    x_swap
     % adjust result order
     for i = 1:length(x_swap)
       if 0 ~= x_swap(i)

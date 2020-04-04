@@ -1,3 +1,3 @@
-function x = GaussSiedel(A, b, epsilon, useExactCriteria)
-  x = IterativeMethods(A, b, epsilon, useExactCriteria, false, false);
+function [x, step] = GaussSiedel(A, b, epsilon, useExactCriteria)
+  [x, step] = IterativeMethods(A, b, epsilon, useExactCriteria, false, false);
 end
