@@ -1,4 +1,4 @@
-function x = IterativeMethods(A, b, epsilon, useExactCriteria, jacobi)
+function x = IterativeMethods(A, b, epsilon, useExactCriteria, jacobi, pworkers)
   addpath('../HW1');
   err = Inf;
   % usefull functions
@@ -18,9 +18,21 @@ function x = IterativeMethods(A, b, epsilon, useExactCriteria, jacobi)
   [col_idxs, row_vals] = arrayfun(@(i) genCompRows(A, n, i), 1:n, 'UniformOutput', false);
   % diag values are stored as last element
 
+  pool = false;
+  if pworkers > 1
+    % parallel computation works only with jacobi.
+    assert(jacobi);
+    pool = parpool(pworkers);
+  end
   step = 0;
   while err > epsilon
     step = step + 1;
+
+    if pworkers > 1
+      parfor i = 1:n
+        new_x(i) = b(i)/ A.V(i) -dot(row_vals{i} / A.V(i), x(col_idxs{i}));
+      end
+    else
       for i = 1:n
         % case GaussSiedel: use already computed value at step i
         x_vals = new_x(col_idxs{i});
@@ -30,6 +42,7 @@ function x = IterativeMethods(A, b, epsilon, useExactCriteria, jacobi)
         end
         new_x(i) = b(i) / A.V(i) - dot(row_vals{i} / A.V(i), x_vals);
       end
+    end
 
     old_err = err;
     if useExactCriteria
@@ -39,6 +52,10 @@ function x = IterativeMethods(A, b, epsilon, useExactCriteria, jacobi)
     end
     assert(err <= old_err);
     x = new_x;
+  end
+
+  if pworkers > 1
+    delete(pool);
   end
 
   % WARNING: This function does not include diagonal elements.
