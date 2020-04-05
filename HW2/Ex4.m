@@ -1,13 +1,13 @@
 addpath('../HW1');
 % Experiment constants
-DEF_MUL = 100;
-DEF_STEPS = 2;
-DEF_REPEAT = 10;
+DEF_MUL = 2500;
+DEF_STEPS = 8;
+DEF_REPEAT = 5;
 DEF_NON_DIAG_UBOUND = 100;
 DEF_EPSILON = 10^-5;
 % my machine supports at most 2 workers
 DEF_WORKERS = 2;
-DEF_SPARSITY = 0.8;
+DEF_SPARSITY = 0.01;
 % NOTE: exact = true creates overhead which is not good for exp. eval.
 DEF_USE_EXACT = false;
 
@@ -44,18 +44,22 @@ for i = 1:DEF_STEPS
     Jacobi(c, b, DEF_EPSILON, false, true);
     y_pj = cputime - t;
     Y_parallel(i) = Y_parallel(i) + y_pj;
+    fprintf("Parallel time %f\n", y_pj);
 
     % time for seq jacobi
     t = cputime;
     Jacobi(c, b, DEF_EPSILON, false, false);
     y_sj = cputime - t;
     Y_sequential(i) = Y_sequential(i) + y_sj;
+    fprintf("Sequential time %f\n", y_pj);
 
   end
 
   % get the mean
   Y_parallel(i) = Y_parallel(i) / DEF_REPEAT;
+  fprintf("Average parallel time with n = %d %f\n", n, Y_parallel(i));
   Y_sequential(i) = Y_sequential(i) / DEF_REPEAT;
+  fprintf("Average Sequential time with n = %d %f\n", n, Y_sequential(i));
 end
 
 Y_sequential
