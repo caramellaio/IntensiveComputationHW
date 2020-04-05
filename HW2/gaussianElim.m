@@ -1,8 +1,10 @@
-function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph)
+function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph, video_file)
   n = size(A, 2);
 
   if show_spy
     spy(A);
+    drawnow;
+    frames(1) = getframe(gcf);
   end
 
   step = 1;
@@ -25,10 +27,6 @@ function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph)
       sp_vec(step) = (count - nnz(A)) / count;
     end
 
-    if show_spy
-      %pause(0.005);
-      spy(A);
-    end
     for i = k+1:n
 
       mul_i_k = A(i, k) / A(k, k);
@@ -36,15 +34,21 @@ function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph)
       A(i, k:n) = A(i, k:n) - (mul_i_k * A(k, k:n));
 
       b(i) = b(i) - mul_i_k * b(k);
-      if show_spy
-        pause(0.0005);
-        spy(A);
-      end
 
       if compute_graph
         sp_vec(step) = (count - nnz(A)) / count;
       end
+
       step = step + 1;
+
+      if show_spy
+        spy(A);
+        if strlength(video_file) > 0
+          drawnow;
+          frames(step) = getframe(gcf);
+        end
+      end
+
     end
   end
 
@@ -56,12 +60,22 @@ function x = gaussianElim(A, b, getPivoting, show_spy, compute_graph)
   end
   x = backwardSub(A, b);
   adjust_x();
+  if show_spy
+    if strlength(video_file) > 0
+      v = VideoWriter(video_file);
+      open(v);
+      writeVideo(v, frames);
+      close(v);
+    end
+  end
 
   function swap(k0, k1)
     assert(sum(k1 >= k0) == 2);
     if ~isequal(k0, k1)
       % swap rows
-      fprintf("Swapping %d %d with %d %d", k0(1), k0(2), k1(1), k1(2));
+      if compute_graph
+        fprintf("Swapping %d %d with %d %d\n", k0(1), k0(2), k1(1), k1(2));
+      end
       if k0(1) ~= k1(1)
         temp = A(k0(1),:);
         A(k0(1),:) = A(k1(1),:);

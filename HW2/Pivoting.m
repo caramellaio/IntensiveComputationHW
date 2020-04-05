@@ -11,7 +11,7 @@ function new_row_idx = zeroPivoting(A, b, k)
 
   if A(k, k) == 0
     % find the next non zero element of the kth column
-    nnz_pos = find(A(k+1:end,k))+ k
+    nnz_pos = find(A(k+1:end,k))+ k;
 
     if length(nnz_pos) == 0
       % this matrix cannot be triangular
@@ -43,8 +43,8 @@ end
 
 function new_swap = GECPCompletePivoting(A, b, k)
   abs_m = abs(A(k:end, k:end));
-  lst = abs_m(:)
-  [val, tmp_idx] = max(lst)
+  lst = abs_m(:);
+  [val, tmp_idx] = max(lst);
 
   % parse index into the result
   [x, y] = ind2sub(size(abs_m), tmp_idx);
