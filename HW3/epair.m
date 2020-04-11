@@ -5,7 +5,7 @@ function [x, eig_val] = epair(M, n)
 
   for i = 1:n
     y = M * x;
-    eig_val = max(y, [], 'all');
+    eig_val = norm(y, Inf);
     x = y / eig_val;
   end
 end
