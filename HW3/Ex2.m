@@ -1,6 +1,6 @@
-DEF_N = 50;
+DEF_N = 25;
 DEF_N_IT=100;
-DEF_AVG_DEG = 15;
+DEF_AVG_DEG = 6;
 HIGHLIGHT_COL_1 = 'r';
 HIGHLIGHT_COL_2 = 'g';
 

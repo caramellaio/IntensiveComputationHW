@@ -59,6 +59,9 @@ hold on
 er = errorbar(X, error_epair, error_epair_min, error_epair_max);
 er.Color = [0, 0, 0];
 er.LineStyle = 'none'
+title("Epair error");
+xlabel("matrix size");
+ylabel("error value");
 
 % deflation
 subplot(1, 2, 2);
@@ -68,5 +71,8 @@ hold on
 er = errorbar(X, error_defl, error_defl_min, error_defl_max);
 er.Color = [0, 0, 0];
 er.LineStyle = 'none'
+title("deflation error");
+xlabel("matrix size");
+ylabel("error value");
 
 hold off

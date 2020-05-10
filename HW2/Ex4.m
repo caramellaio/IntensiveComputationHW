@@ -1,13 +1,14 @@
 addpath('../HW1');
 % Experiment constants
-DEF_MUL = 2500;
-DEF_STEPS = 8;
-DEF_REPEAT = 5;
+DEF_MUL = 100;
+DEF_STEPS = 10;
+DEF_REPEAT = 15;
 DEF_NON_DIAG_UBOUND = 100;
 DEF_EPSILON = 10^-5;
+DEF_START=0;
 % my machine supports at most 2 workers
 DEF_WORKERS = 2;
-DEF_SPARSITY = 0.01;
+DEF_SPARSITY = 0.3;
 % NOTE: exact = true creates overhead which is not good for exp. eval.
 DEF_USE_EXACT = false;
 
@@ -29,7 +30,7 @@ Y_overhead = ones(1, DEF_STEPS) * y_o
 
 % jacobi time calc
 for i = 1:DEF_STEPS
-  n = i * DEF_MUL;
+  n = i * DEF_MUL + DEF_START;
 
   n
   for j = 1:DEF_REPEAT
@@ -51,7 +52,7 @@ for i = 1:DEF_STEPS
     Jacobi(c, b, DEF_EPSILON, false, false);
     y_sj = cputime - t;
     Y_sequential(i) = Y_sequential(i) + y_sj;
-    fprintf("Sequential time %f\n", y_pj);
+    fprintf("Sequential time %f\n", y_sj);
 
   end
 
@@ -75,7 +76,7 @@ DEF_PAR_LABEL = "Parallel Execution (without overhead)";
 DEF_PAR_LABEL_WITH_OVERHEAD = "Parallel Execution (with overhead)";
 X_LABEL_NAME = "size of matrix (count of rows)";
 Y_LABEL_NAME = "execution time (sec)"
-X = (1:DEF_STEPS) * DEF_MUL;
+X = (1:DEF_STEPS) * DEF_MUL + DEF_START;
 % plot of results
 plot(X, Y_sequential, 'DisplayName', DEF_SEQ_LABEL);
 hold on;
