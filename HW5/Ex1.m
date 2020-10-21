@@ -1,9 +1,16 @@
-start = randperm(n);
-fin = randperm(n);
+n = 16;
+%n=8;
+%start = randperm(n);
+start = [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15];
+fin = [7 13 2 12 15 4 9 3 10 1 14 5 11 8 16 6];
+fin = fin - 1;
 
 %start = [0 1 2 3 4 5 6 7];
+%fin = [0 1 2 3 4 5 6 7];
 %fin =   [7 0 1 5 3 4 2 6];
+%n = 8;
 
+%fin = fin - 1;
 [P, S] = selfRoutingButterfly(start, fin);
 
 p = drawButterfly(log2(length(start)));

@@ -1,62 +1,111 @@
 function [P, S] = selfRoutingButterfly(vals_start, vals_dest)
-  N = length(vals_start)
-  n = log2(N)
+  N = length(vals_start);
+  n = log2(N);
   P = zeros(N, 2 * n);
   S = zeros(N / 2, n);
 
   % unset = -1
   S = S -1;
-  P = P -1;
+  P = P + NaN;
 
   max_n = n;
 
-  for i = 1:N
-    start = vals_start(i);
-    bin_dest = decToBin(vals_dest(i), n);
+  % assign initial values
+  P(:,1) = 1:N;
 
-    actual_y = i;
-    assert(actual_y <= N);
-    for j = 1:max_n
-      assert(actual_y > 0 && actual_y <= N);
-      P(actual_y, (2 * j) -1) = start
+  % gen bin vals
 
+  bin_dest = zeros(N, n) - 1;
 
-      % If I am up and I want to go down (1) 
-      % or if I am down and I want to go up (2)
-      if (bin_dest(j) && mod(actual_y, 2) == 1 || ~bin_dest(j) && mod(actual_y, 2) == 0)
+  for i =1:N
+    bin = decToBin(vals_dest(i), n);
+    bin_dest(i, :) = bin;
+  end
+
+  for i = 1:n
+    % case there was a conflict and we surpass the conflict level! 
+    if i > n
+      break;
+    end
+
+    % nominal internal iteration
+    for j = 1:N
+      % 2 * i - 1 because we consider the entrance in that level:
+      % - 2 * i - 1 = entrance
+      % - 2 * i     = exit
+      actual_val = P(j, 2 * i - 1)
+
+      bit = bin_dest(actual_val, i)
+      % choose if we need to apply flip
+      % flip if I am up and I want to go down and viceversa
+      bit
+      if bit && mod(j, 2) == 1 || ~bit && mod(j, 2) == 0
         flip = 1;
       else
         flip = 0;
       end
-      if -1 == S(int32(actual_y / 2), j)
-        S(int32(actual_y/ 2), j) = flip;
-      elseif flip ~= S(int32(actual_y / 2), j)
-        % CONFLICT!!!
-        S(int32(actual_y / 2), j) = NaN;
-        % update new n and exit
-        max_n = j - 1;
+
+      fprintf("Flip = %d\n", flip);
+
+      % Assign S
+
+      if -1 == S(int32(j / 2), i)
+        % case where the value is not assigned yet: assign it now.
+        S(int32(j / 2), i) = flip;
+      elseif flip == S(int32(j / 2), i)
+        % nothing to do, value is OK :)
       else
-        assert(S(int32(actual_y / 2), j) == flip);
+        % CONFLICT
+        S(int32(j / 2), i) = NaN;
+        fprintf("Conflict at: %d %d", i, j);
+        S
+        % let the inner cycle continue the stop on this level for the remaining values...
+        n = i
+        continue
       end
 
-      aaa = actual_y;
-      if S(int32(actual_y / 2), j) == 1
+      % assign exit P
+      % I use actual_y / 2 to consider the block y in the current position
+      % (divide 2 because actual_y refers to one of the 2 input per matrix
+
+      % assign new y index
+      new_j = j;
+
+      % if we find a cross S then we have to update the index
+      if S(int32(j / 2), i) == 1
         % cross: change y value
-        if (mod(actual_y, 2)) == 0
-          actual_y = actual_y - 1;
+        if (mod(j, 2)) == 0
+          new_j = j - 1;
         else
-          actual_y = actual_y + 1;
+          new_j = j + 1;
         end
       end
 
-      assert(actual_y <= N);
-      P(actual_y, 2*j) = start;
-      if j < max_n
-        actual_y = get_next_pos(S, j, actual_y);
+      % assign actual value to the exit part
+      P(new_j, 2 * i) = actual_val;
+
+      % if we are at the last level we do not have to calculate a new j!
+      if i ~= n
+        % get the new y position for the entrance
+        new_j
+        %assert(i <= n);
+
+        new_j = get_next_pos(S, i, new_j)
+
+        % set value for the new entrance...
+
+        P(new_j, 2 * (i + 1) - 1) = actual_val;
       end
     end
-
   end
+
+  % replace index representation with effective start values...
+  for i=1:N
+    idxs = find(P == i);
+
+    P(idxs) = vals_start(i);
+  end
+
 end
 
 function bin = decToBin(D, bits)
@@ -104,7 +153,5 @@ function p = get_next_pos(S, j, actual_y)
     end
   end
   
-  actual_y
-  p
   assert(p > 0 && p <= 2 * size(S, 1));
 end
