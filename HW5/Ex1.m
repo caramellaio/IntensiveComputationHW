@@ -1,12 +1,12 @@
 n = 16;
-%n=8;
-%start = randperm(n);
+n=8;
+start = randperm(n) - 1;
+fin = randperm(n) - 1;
 start = [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15];
 fin = [7 13 2 12 15 4 9 3 10 1 14 5 11 8 16 6];
 fin = fin - 1;
 
 %start = [0 1 2 3 4 5 6 7];
-%fin = [0 1 2 3 4 5 6 7];
 %fin =   [7 0 1 5 3 4 2 6];
 %n = 8;
 
@@ -29,3 +29,8 @@ highlight(p, cross_idxs, 'NodeColor', CROSS_COLOR)
 highlight(p, conf_idxs, 'NodeColor', CONF_COLOR)
 highlight(p, straight_idxs, 'NodeColor', STRAIGHT_COLOR)
 highlight(p, non_calc_idxs, 'NodeColor', NON_CALC_COLOR)
+
+%annotation('textbox', [0.75, 0.1, 0.1, 0.1, 0.1], 'String', "Red=error, Straight=blue, cross=green");
+start
+fin
+annotation('textbox',[.9 .5 .1 .2],'String','Blue=straight, green = cross','EdgeColor','none')

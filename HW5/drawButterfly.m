@@ -16,38 +16,19 @@ function p = drawButterfly(n)
   end
 
   Y = nodes_per_level - Y;
-  %{
-  construct_graph_rec(nodes_per_level, n);
-  for i = 1:n
-    X((i-1)*nodes_per_level + 1: i * nodes_per_level) = i * X_DIST;
-
-    % foreach subblock
-    stage_blocks = i;
-    block_size = nodes_per_level / stage_blocks;
-    for j = 1:stage_blocks
-      
-    end
-  end
-  %}
 
   g = graph(genAdjMatrix(nodes_per_level, n, X, Y));
   p = plot(g, 'XData', X, 'YData', Y);
 end
 
-function construct_graph_rec(G, npl, n)
-  if n == 2
-    addedge()
-  end
-end
-
 function M = genAdjMatrix(v_per_level, levels, X, Y)
   sz = v_per_level * levels;
-  M = zeros(sz)
+  M = zeros(sz);
   UP_CONN = 2;
   DOWN_CONN = 1;
 
   for i = 1:sz- v_per_level
-    pos_x = X(i)
+    pos_x = X(i);
     pos_y = Y(i);
 
     pos = [pos_x, pos_y];
@@ -57,8 +38,7 @@ function M = genAdjMatrix(v_per_level, levels, X, Y)
 
     if is_upper_part
       M(i, i + v_per_level) = UP_CONN;
-      fprintf("aaaaa\n");
-      v_per_level + block_size / 2
+      v_per_level + block_size / 2;
       M(i, i + int32(v_per_level + block_size / 2)) = DOWN_CONN;
       M(i + v_per_level, i) = UP_CONN;
       M(i + int32(v_per_level + block_size / 2), i) = DOWN_CONN;
@@ -71,5 +51,5 @@ function M = genAdjMatrix(v_per_level, levels, X, Y)
     end
   end
 
-  M = logical(M)
+  M = logical(M);
 end

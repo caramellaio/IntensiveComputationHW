@@ -1,7 +1,17 @@
+% full adder / half adder constants
 
+global TFA;
+global THA;
+global AFA;
+global AHA;
+
+TFA = 4;
+THA = 2;
+AFA = 7;
+AHA = 3;
 
 N_VALS = 3:5;
-K_VALS = [100 500 1000];
+K_VALS = [100 500 1000 2000];
 
 pipeline_n_time = zeros(1, length(N_VALS));
 pipeline_k_time = zeros(1, length(K_VALS));
@@ -37,7 +47,7 @@ for i = 1:length(N_VALS)
 end
 
 % computing K vals
-for i = 1:length(N_VALS)
+for i = 1:length(K_VALS)
   [p_k_t, p_k_s] = pipelinedAdditionSpeedup(K_VALS(i), N_VALS(1));
   [rns_k_t, rns_k_s] = RNSSumSpeedup(K_VALS(i), N_VALS(1));
   [rb_k_t, rb_k_s] = RNSRBSumSpeedup(K_VALS(i), N_VALS(1));
@@ -110,70 +120,81 @@ legend(axk_space);
 
 % COMPUTING FUNCTIONS
 function [t, s] = pipelinedAdditionSpeedup(k, n)
+  global TFA;
+  global THA;
+  global AFA;
+  global AHA;
+
   M = prod(2^n -1:2^n + 1);
 
-  nn = ceil(log2(M - 1));
-  t = nn * k;
-  s = t;
+  % number of bits
+  nn = floor(log2(M - 1)) + 1;
 
-  time_in_FA = 0;
-  space_in_FA = 0;
+  % first we compute ripple carry adder values
+  [tRca, sRca] = RCACost(k, n);
 
-  for i =1:k
-    val1 = int32(rand*(M-1));
-    val2 = int32(rand*(M-1));
 
-    % n -1 half adder time = n - 1 /2 full adder time
-    time_in_FA = time_in_FA + (nn - 1) / 2;
-    % 3 / 7 to pass from HA to FA. N^2/2 HA_circuits
-    space_in_FA = space_in_FA + (3 / 7) *(nn ^ 2) / 2;
-  end
+  % the time = number of bits + k - 1 all multiplied by the half adder time
+  timePipeline = (nn + k - 1) * THA;
+  spacePipeline = nn * (nn + 1) / 2 * AHA;
 
-  t = t / time_in_FA;
-  s = s / space_in_FA;
+  t = tRca / timePipeline;
+  s = sRca / spacePipeline;
 end
 
 function [t, s] = RNSSumSpeedup(k, n)
+  global TFA;
+  global THA;
+  global AFA;
+  global AHA;
 
   M = prod(2^n -1:2^n + 1);
-  t = k * ceil(log2(M - 1));
-  s = t;
 
-  time_in_FA = 0;
-  space_in_FA = 0;
-  for i = 1:k
-    val1 = int32(rand*(M-1));
-    val2 = int32(rand*(M-1));
 
-    % it tooks n for mod1 and mod2, it tooks n + 1 for mod3
-    time_in_FA = time_in_FA + 3 * (n + 1);
-    % we need n FA for mod1 and mod2 + we need n + 1 FA for mod3
-    space_in_FA = space_in_FA + 3 * (n * n * (n + 1));
-  end
+  % first we compute ripple carry adder values
+  [tRca, sRca] = RCACost(k, n);
 
-  t = t / time_in_FA;
-  s = s / space_in_FA;
+  % here the time is the max number of bits * k times * time of full adder
+  tRNS = k * (n + 1) * TFA;
+  % as area we use n bits 2 times + the last time n + 1. All considering the space of a full adder
+  sRNS = AFA * (n + n + n + 1);
+
+  t = tRca / tRNS;
+  s = sRca / sRNS;
 end
 
 function [t, s] = RNSRBSumSpeedup(k, n)
-  M = prod(2^n -1:2^n + 1);
-  t = k * ceil(log2(M - 1));
-  s = t;
+  global TFA;
+  global THA;
+  global AFA;
+  global AHA;
 
-  time_in_FA = 0;
-  space_in_FA = 0;
-  for i = 1:k
-    val1 = int32(rand*(M-1));
-    val2 = int32(rand*(M-1));
-    % case 3
-    % time is constant. It is 2 because RB sum has 2 steps
-    time_in_FA = time_in_FA + 2 * 3; 
-    % every bit couple has 2 FA.
-    % 2 couples have n bits, the last couple has n + 1 bits
-    space_in_FA = space_in_FA + 2 * n * n * (n + 1) * 3;
-  end
+  % first we compute ripple carry adder values
+  [tRca, sRca] = RCACost(k, n);
 
-  t = t / time_in_FA;
-  s = s / space_in_FA;
+  % we use TFA k times * 2 because RB sum has 2 steps
+  tRNSRB = TFA  * 2;
+
+  % 2 elements have n bits, the last n + 1 bits
+  sRNSRB = AFA * (n + n + n + 1) * 2;
+
+  t = tRca / tRNSRB;
+  s = sRca / sRNSRB;
 end
 
+function [t, s] = RCACost(k, n)
+  global TFA;
+  global THA;
+  global AFA;
+  global AHA;
+
+  M = prod(2^n -1:2^n + 1);
+
+  % number of bits
+  nn = floor(log2(M - 1)) + 1;
+
+  % number of bits * k * time of a full adder
+  t = nn * k * TFA;
+  % and ripple carry adder space (number of bits * full adder space)
+  s = nn * AFA;
+end

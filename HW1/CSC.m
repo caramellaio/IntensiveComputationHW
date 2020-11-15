@@ -51,15 +51,12 @@ function row = extractRowCSC(C, i)
   n = length(C.J) -1;
   row = zeros(1, n);
 
-  [col_idx, row_val] = extractRowCSCCompact(C, i)
+  [col_idx, row_val] = extractRowCSCCompact(C, i);
 
   row(col_idx) = row_val;
 end
 
 function [col_idx, row_val] = extractRowCSCCompact(C, i)
-  % TODO: This implementation is not optimal
-  idx = 1;
-
   range = find(C.I == i);
   row_val = C.A(range);
   col_idx = zeros(length(row_val), 1, 'int32');

@@ -19,11 +19,9 @@ function ExpEvals(funcs, genMFunc, method_labels)
 
   % we perform 5 iterations and then we get the avg.
   iters = 10;
-  n_configs = 1:8;
+  n_configs = 1:5;
 
   n_configs = n_configs * 25;
-  Y_time_comp = zeros(1, length(n_configs));
-  Y_space_comp = zeros(1, length(n_configs));
 
   space = zeros(length(funcs), length(n_configs));
   time = zeros(length(funcs), length(n_configs));

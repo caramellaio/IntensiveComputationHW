@@ -1,6 +1,6 @@
 addpath('../HW1');
 
-DEF_N = 600;
+DEF_N = 200;
 DEF_EPSILON = 10^-9;
 DEF_NON_DIAG_UBOUND = 100;
 DEF_SPARSITY = 0.65;

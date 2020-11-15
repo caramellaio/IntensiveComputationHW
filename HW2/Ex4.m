@@ -1,7 +1,7 @@
 addpath('../HW1');
 % Experiment constants
-DEF_MUL = 100;
-DEF_STEPS = 10;
+DEF_MUL = 50;
+DEF_STEPS = 5;
 DEF_REPEAT = 15;
 DEF_NON_DIAG_UBOUND = 100;
 DEF_EPSILON = 10^-5;

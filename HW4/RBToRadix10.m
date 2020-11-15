@@ -1,4 +1,4 @@
-function X = RBToRadix10(AN, AR, max_v)
+function decVal = RBToRadix10(AN, AR)
   n = length(AN);
 
   assert(n == length(AR));
@@ -19,7 +19,18 @@ function X = RBToRadix10(AN, AR, max_v)
   end
 
   if carry == 1
-    fprintf("Error: overflow");
+    error("Error: overflow!\n");
     X = NaN;
+    decVal = NaN;
+  else
+    decVal = binToDec(X);
   end
+end
+
+function result = binToDec(X)
+  n = length(X);
+
+  assert(n > 0);
+
+  result = sum(arrayfun(@(i, j) j * 2^(i-1), n:-1:1, X));
 end
